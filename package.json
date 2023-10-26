@@ -1,0 +1,53 @@
+{
+  "comment": "update this",
+  "name": "blog_api",
+  "version": "1.0.0",
+  "description": "blog api written in javascript",
+  "main": "server.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node server",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "lotusbetaanalytics"
+  },
+  "keywords": [
+    "blog", "api"
+  ],
+  "author": "LBAN",
+  "license": "MIT",
+  "dependencies": {
+    "@azure/storage-blob": "^12.14.0",
+    "axios": "^1.4.0",
+    "azure-storage": "^2.10.7",
+    "bcryptjs": "^2.4.3",
+    "colors": "^1.4.0",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "crypto": "^1.0.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.2.1",
+    "express-mongo-sanitize": "^2.1.0",
+    "express-rate-limit": "^5.2.6",
+    "helmet": "^4.6.0",
+    "hpp": "^0.2.3",
+    "into-stream": "^6.0.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^5.12.11",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.3",
+    "nodemailer": "^6.6.1",
+    "otp-generator": "^4.0.1",
+    "passport": "^0.6.0",
+    "request": "^2.88.2",
+    "slugify": "^1.5.3",
+    "stream": "^0.0.2",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}
