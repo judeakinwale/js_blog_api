@@ -12,12 +12,6 @@ const { audit } = require("../utils/auditUtils");
 exports.createAuditTrail = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
 
-  // const { title } = req.body;
-  // const data = await AuditTrail.findOneAndUpdate({ title }, req.body, {
-  //   new: true,
-  //   runValidators: true,
-  //   upsert: true,
-  // });
   const [data] = await Promise.all([
     await AuditTrail.create(req.body),
     await audit.create(req.user, "AuditTrail"),

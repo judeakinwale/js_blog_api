@@ -95,3 +95,61 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
     data: {},
   });
 });
+
+
+// @desc    Activate User
+// @route   GET /api/v1/user/:id/activate
+// @access   Private
+exports.activateUser = asyncHandler(async (req, res, next) => {
+  const id = req.params.id ?? req.user?._id;
+  if (!id) return next(new ErrorResponse(`User Id not provided`, 400));
+
+  if (req.user.role !== "SuperAdmin" || req.params.id !== req.user?._id) {
+    return new ErrorResponse(
+      "You are not authorized to activate this user",
+      401
+    );
+  }
+
+  const data = await User.findByIdAndUpdate(
+    id,
+    { isActive: true },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
+// @desc    Deactivate User
+// @route   GET /api/v1/user/:id/deactivate
+// @access   Private
+exports.deactivateUser = asyncHandler(async (req, res, next) => {
+  const id = req.params.id ?? req.user?._id;
+  if (!id) return next(new ErrorResponse(`User Id not provided`, 400));
+
+  if (req.user.role !== "SuperAdmin" || req.params.id !== req.user?._id) {
+    return new ErrorResponse(
+      "You are not authorized to deactivate this user",
+      401
+    );
+  }
+
+  const data = await User.findByIdAndUpdate(
+    id,
+    { isActive: false },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
