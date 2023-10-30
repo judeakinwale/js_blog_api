@@ -65,10 +65,10 @@ const UserSchema = new mongoose.Schema({
     select: false,
   },
 
-  subscription: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Subscription",
-  },
+  // subscription: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Subscription",
+  // },
   points: {
     type: Number,
     default: 0,
@@ -100,9 +100,17 @@ const UserSchema = new mongoose.Schema({
   },
 
   loginAttempts: [{ type: String }],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    // default: Date.now,
   },
 });
 //Encrypt password using bcrypt
@@ -129,7 +137,7 @@ UserSchema.methods.getSignedJwtToken = function () {
       lastname: this.lastname,
       email: this.email,
       phone: this.phone,
-      tenant: this.tenant,
+      // tenant: this.tenant,
     },
     process.env.JWT_SECRET,
     {
@@ -168,14 +176,16 @@ UserSchema.methods.getActivationToken = function () {
 };
 
 UserSchema.index({
-  tenant: "text",
+  // tenant: "text",
   email: "text",
   isTrial: "text",
-  isTitle: "text",
+  firstname: "text",
+  lastname: "text",
 });
 
-UserSchema.path("subscription").validate(async (value) => {
-  return await mongoose.model("Subscription").findById(value);
-}, "Subscription does not exist");
+// * Disable Subscription validation
+// UserSchema.path("subscription").validate(async (value) => {
+//   return await mongoose.model("Subscription").findById(value);
+// }, "Subscription does not exist");
 
 module.exports = mongoose.model("User", UserSchema);

@@ -1,6 +1,7 @@
 node_modules/
 config/.env
 build/
+to_delete/
 *.env
 package-lock.json
 sample_data.js

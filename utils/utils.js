@@ -1,3 +1,5 @@
+const ErrorResponse = require("./errorResponse");
+
   /**
  * @summary Update the request body with metadata
  * @param {Object} data - req.body
@@ -8,18 +10,23 @@
 exports.updateMetaData = (
   data,
   actor = undefined,
+  isUpdate = false,
   timestamp = Date.now(),
-  isUpdate = false
+  loginRequired = false,
+  defaultActivation = false,
+  defaultApproval = false
 ) => {
-  // * if (!actor) throw new Error("You must be logged in to perform this action")
+  if (loginRequired &&  !actor) throw new ErrorResponse("You must be logged in to perform this action", 401)
+
   if (isUpdate) {
-    data["updatedBy"] = actor;
-    data["updatedAt"] = timestamp;
+    data["updatedBy"] = data["updatedBy"] || actor;
+    data["updatedAt"] = data["updatedAt"] || timestamp;
   } else {
-    data["createdBy"] = actor || data["user"];
+    data["createdBy"] = data["createdBy"] || data["user"] || actor;
     data["user"] = data["user"] || actor;
-    // * data["isActive"] = undefined
-    // * data["isApproved"] = undefined
+    
+    if (defaultActivation) data["isActive"] = defaultActivation
+    if (defaultApproval) data["isApproved"] = defaultApproval
   }
 };
 

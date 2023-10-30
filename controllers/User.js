@@ -6,20 +6,22 @@ const { updateMetaData } = require("../utils/utils");
 const { activateAccountEmail } = require("../utils/emailUtils");
 const { audit } = require("../utils/auditUtils");
 
-exports.populateUser = [{}];
+exports.populateUser = [{ path: "createdBy" }];
 
 // @desc    Create User/
 // @route   POST/api/v1/user
 // @access   Public
 exports.createUser = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
+  if (!req.body.email) throw new ErrorResponse(`Email Required!`, 400)
   req.body.email = req.body.email && req.body.email?.toLowerCase();
 
   // check user account exists
   const existingData = await User.findOne({ email: req.body.email });
   if (existingData) return next(new ErrorResponse(`Account exists!`, 400));
 
-  const data = await User.create(req.body).populate();
+  // const data = await User.create(req.body).populate();
+  const data = await User.create(req.body);
   if (!data) return next(new ErrorResponse(`User not found!`, 404));
 
   // notification for  signup
@@ -96,7 +98,6 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 // @desc    Activate User
 // @route   GET /api/v1/user/:id/activate
 // @access   Private
@@ -104,8 +105,8 @@ exports.activateUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id ?? req.user?._id;
   if (!id) return next(new ErrorResponse(`User Id not provided`, 400));
 
-  if (req.user.role !== "SuperAdmin" || req.params.id !== req.user?._id) {
-    return new ErrorResponse(
+  if (req.user?.role !== "SuperAdmin" || req.params.id !== req.user?._id) {
+    throw new ErrorResponse(
       "You are not authorized to activate this user",
       401
     );
@@ -132,8 +133,8 @@ exports.deactivateUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id ?? req.user?._id;
   if (!id) return next(new ErrorResponse(`User Id not provided`, 400));
 
-  if (req.user.role !== "SuperAdmin" || req.params.id !== req.user?._id) {
-    return new ErrorResponse(
+  if (req.user?.role !== "SuperAdmin" || req.params.id !== req.user?._id) {
+    throw new ErrorResponse(
       "You are not authorized to deactivate this user",
       401
     );
@@ -152,4 +153,3 @@ exports.deactivateUser = asyncHandler(async (req, res, next) => {
     data,
   });
 });
-

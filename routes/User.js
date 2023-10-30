@@ -6,6 +6,8 @@ const {
   updateUser,
   deleteUser,
   populateUser,
+  activateUser,
+  deactivateUser,
 } = require("../controllers/User");
 const User = require("../models/User");
 const { protect, authorize } = require("../middleware/auth");
@@ -15,6 +17,8 @@ const router = express.Router();
 
 router.route("/").post(createUser);
 router.route("/").get(advancedResults(User, populateUser), getUsers);
+router.route("/:id/activate").get(activateUser);
+router.route("/:id/deactivate").get(deactivateUser);
 router.route("/:id").get(getUser);
 router.route("/:id").patch(updateUser);
 router.route("/:id").delete(deleteUser);

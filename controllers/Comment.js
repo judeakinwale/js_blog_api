@@ -3,8 +3,20 @@ const asyncHandler = require("../middleware/async");
 const Comment = require("../models/Comment");
 const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const Post = require("../models/Post");
 
-exports.populateComment = [{}];
+exports.populateComment = [
+  {
+    path: "children",
+    populate: {
+      path: "children",
+      populate: {
+        path: "children",
+        populate: { path: "children" },
+      },
+    },
+  },
+];
 
 // @desc    Create Comment/
 // @route   POST  /api/v1/comment/
@@ -24,6 +36,22 @@ exports.createComment = asyncHandler(async (req, res, next) => {
     }
   );
   if (!data) return next(new ErrorResponse(`Comment not found!`, 404));
+
+  // update parent comment
+  if (data.parent) {
+    const parentComment = await Comment.findByIdAndUpdate(data.parent, {
+      $push: { children: data },
+    });
+    if (!parentComment)
+      return next(new ErrorResponse(`Related Post not found!`, 404));
+  }
+  
+  // update comments in related post
+  if (data.post) {
+    const relatedPost = await Post.findByIdAndUpdate(data.post, {$push: {comments: data}})
+    if (!relatedPost)
+      return next(new ErrorResponse(`Related Post not found!`, 404));
+  }
 
   await audit.create(req.user, "Comment");
   res.status(201).json({
@@ -46,7 +74,7 @@ exports.getComment = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   if (!id) return next(new ErrorResponse(`Comment Id not provided`, 400));
 
-  let data = await Comment.findById(id);
+  let data = await Comment.findById(id).populate(this.populateComment);
   if (!data) return next(new ErrorResponse(`Comment not found!`, 404));
 
   res.status(200).json({
@@ -65,7 +93,7 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
   const data = await Comment.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
-  });
+  }).populate(this.populateComment);
   if (!data) return next(new ErrorResponse(`Comment not found!`, 404));
 
   await audit.update(req.user, "Comment", data?._id);
@@ -99,8 +127,8 @@ exports.getPopularComments = asyncHandler(async (req, res, next) => {
   const id = req.params.postId;
   const filter = id ? { post: id } : {};
 
-  const comments = await Comment.find(filter);
-  const data = sortArrayOfObjects(comments, "courses", "descending");
+  const comments = await Comment.find(filter).populate(this.populateComment);
+  const data = sortArrayOfObjects(comments, "likes", "descending");
 
   res.status(200).json({
     success: true,
