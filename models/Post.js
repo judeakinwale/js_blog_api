@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Tag = new mongoose.Schema({
+const Post = new mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -14,6 +14,12 @@ const Tag = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  categories: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category",
+    },
+  ],
   likes: [
     {
       type: mongoose.Schema.Types.ObjectId,
@@ -33,7 +39,7 @@ const Tag = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now,
+    // default: Date.now,
   },
   updatedAt: {
     type: Date,
@@ -41,6 +47,6 @@ const Tag = new mongoose.Schema({
   },
 });
 
-Tag.index({ title: "text", description: "text" });
+Post.index({ title: "text", description: "text" });
 
-module.exports = mongoose.model("Tag", Tag);
+module.exports = mongoose.model("Post", Post);

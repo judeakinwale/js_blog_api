@@ -18,6 +18,7 @@ router.route("/").post(createComment);
 router.route("/").get(advancedResults(Comment, populateComment), getComments);
 router.route("/popular").get(getPopularComments);
 router.route("/:id").get(getComment);
+router.route("/:id").put(updateComment);
 router.route("/:id").patch(updateComment);
 router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteComment);
 

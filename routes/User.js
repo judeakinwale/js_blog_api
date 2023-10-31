@@ -20,6 +20,7 @@ router.route("/").get(advancedResults(User, populateUser), getUsers);
 router.route("/:id/activate").get(activateUser);
 router.route("/:id/deactivate").get(deactivateUser);
 router.route("/:id").get(getUser);
+router.route("/:id").put(updateUser);
 router.route("/:id").patch(updateUser);
 router.route("/:id").delete(deleteUser);
 // router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteUser);

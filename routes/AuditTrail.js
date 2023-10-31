@@ -15,6 +15,7 @@ const router = express.Router();
 router.route("/").post(createAuditTrail);
 router.route("/").get(advancedResults(AuditTrail), getAuditTrails);
 router.route("/:id").get(getAuditTrail);
+router.route("/:id").put(updateAuditTrail);
 router.route("/:id").patch(updateAuditTrail);
 router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteAuditTrail);
 

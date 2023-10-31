@@ -2,11 +2,9 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Post = require("../models/Post");
-const {
-  updateMetaData,
-  sortArrayOfObjects,
-} = require("../utils/utils");
+const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const Category = require("../models/Category");
 
 exports.populatePost = [
   {
@@ -35,6 +33,32 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     upsert: true,
   });
   if (!data) return next(new ErrorResponse(`Post not found!`, 404));
+
+  // update posts in categories and validate categories in related post
+  // TODO: update this
+  if (data.categories.length > 0) {
+    await Promise.all(
+      data.categories.map(async (cat) => {
+        const updatedCat = await Category.findByIdAndUpdate(data.post, {
+          $addToSet: { posts: data },
+        });
+        if (!updatedCat) {
+          await Post.findByIdAndUpdate(
+            data._id,
+            {
+              $pull: { categories: cat },
+            },
+            {
+              new: true,
+              runValidators: true,
+            }
+          );
+          // return next(new ErrorResponse(`Related Post not found!`, 404));
+          console.log("Removed non existent category from post");
+        }
+      })
+    );
+  }
 
   await audit.create(req.user, "Post");
   res.status(201).json({
@@ -79,6 +103,122 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
     new: true,
     runValidators: true,
   }).populate(this.populatePost);
+  if (!data) return next(new ErrorResponse(`Post not found!`, 404));
+
+  await audit.update(req.user, "Post", data?._id);
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
+// @desc    Like Post
+// @route   GET api/v1/post/:id/like
+// @access   Private
+exports.likePost = asyncHandler(async (req, res, next) => {
+  // updateMetaData(req.body, req.user?._id, true);
+  updateMetaData(req.body, undefined, true);
+
+  const id = req.params.id;
+  if (!id) return next(new ErrorResponse(`Post Id not provided`, 400));
+
+  const data = await Post.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { likes: req.user?._id },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate(this.populatePost);
+  if (!data) return next(new ErrorResponse(`Post not found!`, 404));
+
+  // await audit.update(req.user, "Post", data?._id);
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
+// @desc    Unlike Post
+// @route   GET api/v1/post/:id/unlike
+// @access   Private
+exports.unlikePost = asyncHandler(async (req, res, next) => {
+  // updateMetaData(req.body, req.user?._id, true);
+  updateMetaData(req.body, undefined, true);
+
+  const id = req.params.id;
+  if (!id) return next(new ErrorResponse(`Post Id not provided`, 400));
+
+  const data = await Post.findByIdAndUpdate(
+    id,
+    {
+      $pull: { likes: req.user?._id },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate(this.populatePost);
+  if (!data) return next(new ErrorResponse(`Post not found!`, 404));
+
+  // await audit.update(req.user, "Post", data?._id);
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
+// @desc    Add Post Category
+// @route   GET api/v1/post/:id/category/add
+// @access   Private
+exports.addPostCategory = asyncHandler(async (req, res, next) => {
+  updateMetaData(req.body, req.user?._id, true);
+  // updateMetaData(req.body, undefined, true);
+
+  const id = req.params.id;
+  if (!id) return next(new ErrorResponse(`Post Id not provided`, 400));
+
+  const data = await Post.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { categories: { $each: req.body.categories } },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate(this.populatePost);
+  if (!data) return next(new ErrorResponse(`Post not found!`, 404));
+
+  await audit.update(req.user, "Post", data?._id);
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
+// @desc    Remove Post Categories
+// @route   GET api/v1/post/:id/category/remove
+// @access   Private
+exports.removePostCategory = asyncHandler(async (req, res, next) => {
+  updateMetaData(req.body, req.user?._id, true);
+  // updateMetaData(req.body, undefined, true);
+
+  const id = req.params.id;
+  if (!id) return next(new ErrorResponse(`Post Id not provided`, 400));
+
+  const data = await Post.findByIdAndUpdate(
+    id,
+    {
+      $pull: { categories: { $each: req.body.categories } },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate(this.populatePost);
   if (!data) return next(new ErrorResponse(`Post not found!`, 404));
 
   await audit.update(req.user, "Post", data?._id);
