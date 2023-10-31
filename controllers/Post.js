@@ -5,6 +5,7 @@ const Post = require("../models/Post");
 const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
 const Category = require("../models/Category");
+const { uploadBlob } = require("../utils/fileUtils");
 
 exports.populatePost = [
   {
@@ -24,6 +25,9 @@ exports.populatePost = [
 // @access   Public
 exports.createPost = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
+
+  if (req.files) 
+    req.body.images = await uploadBlob(req, req.files, "images", "blog");
 
   // const data = await Post.create(req.body);
   const { title, author } = req.body;
@@ -98,6 +102,9 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
 
   const id = req.params.id;
   if (!id) return next(new ErrorResponse(`Post Id not provided`, 400));
+
+  if (req.files)
+    req.body.images = await uploadBlob(req, req.files, "images", "blog");
 
   const data = await Post.findByIdAndUpdate(id, req.body, {
     new: true,

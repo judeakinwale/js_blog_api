@@ -2,11 +2,9 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Category = require("../models/Category");
-const {
-  updateMetaData,
-  sortArrayOfObjects,
-} = require("../utils/utils");
+const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const { uploadBlob } = require("../utils/fileUtils");
 
 exports.populateCategory = "";
 
@@ -16,9 +14,12 @@ exports.populateCategory = "";
 exports.createCategory = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
 
+  if (req.files)
+    req.body.image = (await uploadBlob(req, req.files, "images", "blog"))[0];
+
   // const data = await Category.create(req.body);
-  const { title, author } = req.body;
-  const data = await Category.findOneAndUpdate({ title, author }, req.body, {
+  const { title } = req.body;
+  const data = await Category.findOneAndUpdate({ title }, req.body, {
     new: true,
     runValidators: true,
     upsert: true,
@@ -63,6 +64,9 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
 
   const id = req.params.id;
   if (!id) return next(new ErrorResponse(`Category Id not provided`, 400));
+
+  if (req.files)
+    req.body.image = (await uploadBlob(req, req.files, "images", "blog"))[0];
 
   const data = await Category.findByIdAndUpdate(id, req.body, {
     new: true,

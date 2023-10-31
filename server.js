@@ -24,6 +24,7 @@ const auth = require("./routes/Auth");
 const user = require("./routes/User");
 const post = require("./routes/Post");
 const comment = require("./routes/Comment");
+const category = require("./routes/Category");
 
 //connect to database
 connectDB();
@@ -73,6 +74,7 @@ app.use("/api/v1/auth/", auth);
 app.use("/api/v1/user/", user);
 app.use("/api/v1/post/", post);
 app.use("/api/v1/comment/", comment);
+app.use("/api/v1/category/", category);
 
 // Use Custom Error Handler
 app.use(errorHandler);

@@ -22,7 +22,7 @@ router.route("/:id/deactivate").get(deactivateUser);
 router.route("/:id").get(getUser);
 router.route("/:id").put(updateUser);
 router.route("/:id").patch(updateUser);
-router.route("/:id").delete(deleteUser);
-// router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteUser);
+// router.route("/:id").delete(deleteUser);
+router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteUser);
 
 module.exports = router;
