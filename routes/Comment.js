@@ -7,6 +7,8 @@ const {
   deleteComment,
   getPopularComments,
   populateComment,
+  likeComment,
+  unlikeComment,
 } = require("../controllers/Comment");
 const Comment = require("../models/Comment");
 const { protect, authorize } = require("../middleware/auth");
@@ -21,5 +23,7 @@ router.route("/:id").get(getComment);
 router.route("/:id").put(updateComment);
 router.route("/:id").patch(updateComment);
 router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteComment);
+router.route("/:id/like").get(protect, likeComment);
+router.route("/:id/unlike").patch(protect, unlikeComment);
 
 module.exports = router;

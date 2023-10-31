@@ -45,10 +45,12 @@ exports.createComment = asyncHandler(async (req, res, next) => {
     if (!parentComment)
       return next(new ErrorResponse(`Related Post not found!`, 404));
   }
-  
+
   // update comments in related post
   if (data.post) {
-    const relatedPost = await Post.findByIdAndUpdate(data.post, {$push: {comments: data}})
+    const relatedPost = await Post.findByIdAndUpdate(data.post, {
+      $push: { comments: data },
+    });
     if (!relatedPost)
       return next(new ErrorResponse(`Related Post not found!`, 404));
   }
@@ -133,6 +135,64 @@ exports.getPopularComments = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     count: data.length,
+    data,
+  });
+});
+
+// @desc    Like Comment
+// @route   GET api/v1/comment/:id/like
+// @access   Private
+exports.likeComment = asyncHandler(async (req, res, next) => {
+  // updateMetaData(req.body, req.user?._id, true);
+  updateMetaData(req.body, undefined, true);
+
+  const id = req.params.id;
+  if (!id) return next(new ErrorResponse(`Comment Id not provided`, 400));
+
+  const data = await Comment.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { likes: req.user?._id },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate(this.populateComment);
+  if (!data) return next(new ErrorResponse(`Comment not found!`, 404));
+
+  // await audit.update(req.user, "Comment", data?._id);
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+
+// @desc    Unlike Comment
+// @route   GET api/v1/comment/:id/unlike
+// @access   Private
+exports.unlikeComment = asyncHandler(async (req, res, next) => {
+  // updateMetaData(req.body, req.user?._id, true);
+  updateMetaData(req.body, undefined, true);
+
+  const id = req.params.id;
+  if (!id) return next(new ErrorResponse(`Comment Id not provided`, 400));
+
+  const data = await Comment.findByIdAndUpdate(
+    id,
+    {
+      $pull: { likes: req.user?._id },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  ).populate(this.populateComment);
+  if (!data) return next(new ErrorResponse(`Comment not found!`, 404));
+
+  // await audit.update(req.user, "Comment", data?._id);
+  res.status(200).json({
+    success: true,
     data,
   });
 });
