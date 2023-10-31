@@ -26,8 +26,8 @@ router.route("/:id").put(updatePost);
 router.route("/:id").patch(updatePost);
 router.route("/:id").delete(protect, authorize("SuperAdmin"), deletePost);
 router.route("/:id/like").get(protect, likePost);
-router.route("/:id/unlike").patch(protect, unlikePost);
+router.route("/:id/unlike").get(protect, unlikePost);
 router.route("/:id/category/add").patch(protect, addPostCategory);
-router.route("/:id/category/remove").get(protect, removePostCategory);
+router.route("/:id/category/remove").patch(protect, removePostCategory);
 
 module.exports = router;

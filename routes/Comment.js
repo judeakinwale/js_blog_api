@@ -24,6 +24,6 @@ router.route("/:id").put(updateComment);
 router.route("/:id").patch(updateComment);
 router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteComment);
 router.route("/:id/like").get(protect, likeComment);
-router.route("/:id/unlike").patch(protect, unlikeComment);
+router.route("/:id/unlike").get(protect, unlikeComment);
 
 module.exports = router;
