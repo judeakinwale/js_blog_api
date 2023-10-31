@@ -43,8 +43,8 @@ exports.createPost = asyncHandler(async (req, res, next) => {
   if (data.categories.length > 0) {
     await Promise.all(
       data.categories.map(async (cat) => {
-        const updatedCat = await Category.findByIdAndUpdate(data.post, {
-          $addToSet: { posts: data },
+        const updatedCat = await Category.findByIdAndUpdate(cat, {
+          $addToSet: { posts: data._id },
         });
         if (!updatedCat) {
           await Post.findByIdAndUpdate(

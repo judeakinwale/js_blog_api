@@ -44,7 +44,8 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Get Single User
-// @route   POST/api/v1/user/:id
+// @route   GET /api/v1/user/:id
+// @route   GET /api/v1/auth/me
 // @access   Private/Admin
 exports.getUser = asyncHandler(async (req, res, next) => {
   const id = req.params.id ?? req.user?._id;

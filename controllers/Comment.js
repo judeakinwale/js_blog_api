@@ -43,7 +43,7 @@ exports.createComment = asyncHandler(async (req, res, next) => {
       $push: { children: data },
     });
     if (!parentComment)
-      return next(new ErrorResponse(`Related Post not found!`, 404));
+      return next(new ErrorResponse(`Parent Comment not found!`, 404));
   }
 
   // update comments in related post

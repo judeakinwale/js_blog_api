@@ -20,6 +20,7 @@ router.route("/popular").get(getPopularCategories);
 router.route("/:id").get(getCategory);
 router.route("/:id").patch(updateCategory);
 router.route("/:id").put(updateCategory);
-router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteCategory);
+router.route("/:id").delete(deleteCategory);
+// router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteCategory);
 
 module.exports = router;

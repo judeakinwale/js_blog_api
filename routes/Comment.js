@@ -22,7 +22,8 @@ router.route("/popular").get(getPopularComments);
 router.route("/:id").get(getComment);
 router.route("/:id").put(updateComment);
 router.route("/:id").patch(updateComment);
-router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteComment);
+router.route("/:id").delete(deleteComment);
+// router.route("/:id").delete(protect, authorize("SuperAdmin"), deleteComment);
 router.route("/:id/like").get(protect, likeComment);
 router.route("/:id/unlike").get(protect, unlikeComment);
 
