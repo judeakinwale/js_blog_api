@@ -331,11 +331,7 @@ exports.userTenantPostCreationLogic = async (user) => {
 
 exports.userEnrollmentFactory = async (user, source, type = "Course") => {
   console.log("starting enrollment factory...");
-  const updateOptions = {
-    new: true,
-    runValidators: true,
-    upsert: true,
-  };
+  const updateOptions = upsertOptions;
   switch (type) {
     case "Course":
       const createdCourse = await UserCourse.findOneAndUpdate(
@@ -351,11 +347,7 @@ exports.userEnrollmentFactory = async (user, source, type = "Course") => {
 
 exports.courseEnrollmentFactory = async (user, course) => {
   console.log("starting course enrollment factory...");
-  const updateOptions = {
-    new: true,
-    runValidators: true,
-    upsert: true,
-  };
+  const updateOptions = upsertOptions;
   const createdCourse = await UserCourse.findOneAndUpdate(
     { user, course },
     {},

@@ -5,6 +5,7 @@ const User = require("../models/User");
 const { updateMetaData } = require("../utils/utils");
 const { activateAccountEmail } = require("../utils/emailUtils");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 
 exports.populateUser = [{ path: "createdBy" }];
 
@@ -69,10 +70,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
 
   req.body.email = req.body.email && req.body.email?.toLowerCase();
 
-  let data = await User.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  let data = await User.findByIdAndUpdate(id, req.body, updateOptions);
   if (!data) return next(new ErrorResponse(`User not found!`, 404));
 
   await audit.update(req.user, "User", data?._id);

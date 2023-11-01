@@ -4,6 +4,7 @@ const asyncHandler = require("../middleware/async");
 const Post = require("../models/Post");
 const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 const Category = require("../models/Category");
 const { uploadBlob } = require("../utils/fileUtils");
 
@@ -25,18 +26,15 @@ exports.populatePost = [
 // @access   Public
 exports.createPost = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
+  const message = []
 
   if (req.files) 
     req.body.images = await uploadBlob(req, req.files, "images", "blog");
 
   // const data = await Post.create(req.body);
   const { title, author } = req.body;
-  const data = await Post.findOneAndUpdate({ title, author }, req.body, {
-    new: true,
-    runValidators: true,
-    upsert: true,
-  });
-  if (!data) return next(new ErrorResponse(`Post not created!`, 404));
+  const data = await Post.findOneAndUpdate({ title, author }, req.body, upsertOptions);
+  if (!data) return next(new ErrorResponse(`Post not found!`, 404));
 
   // update posts in categories and validate categories in related post
   // TODO: update this
@@ -53,16 +51,18 @@ exports.createPost = asyncHandler(async (req, res, next) => {
               {
                 $pull: { categories: cat },
               },
-              {
-                new: true,
-                runValidators: true,
-              }
+              updateOptions
             );
             // return next(new ErrorResponse(`Related Post not found!`, 404));
-            console.log("Removed non existent category from post");
+            const errMsg = "Removed non existent category from post";
+            console.log(errMsg);
+            message.push(errMsg);
           }
         } catch (error) {
-          console.log("Updating category or removing invalid category failed");
+          const errMsg =
+            "Updating category or removing invalid category failed";
+          console.log(errMsg);
+          message.push(errMsg);
         }
       })
     );
@@ -72,6 +72,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     data,
+    message,
   });
 });
 
@@ -110,10 +111,7 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
   if (req.files)
     req.body.images = await uploadBlob(req, req.files, "images", "blog");
 
-  const data = await Post.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  }).populate(this.populatePost);
+  const data = await Post.findByIdAndUpdate(id, req.body, updateOptions).populate(this.populatePost);
   if (!data) return next(new ErrorResponse(`Post not found!`, 404));
 
   await audit.update(req.user, "Post", data?._id);

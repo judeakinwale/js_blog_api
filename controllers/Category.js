@@ -4,9 +4,24 @@ const asyncHandler = require("../middleware/async");
 const Category = require("../models/Category");
 const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 const { uploadBlob } = require("../utils/fileUtils");
 
-exports.populateCategory = "";
+exports.populateCategory = exports.populatePost = [
+  {
+    path: "posts",
+    populate: {
+      path: "comments",
+      populate: {
+        path: "children",
+        populate: {
+          path: "children",
+          populate: { path: "children" },
+        },
+      },
+    },
+  },
+];
 
 // @desc    Create Category/
 // @route   POST  /api/v1/category/
@@ -19,11 +34,7 @@ exports.createCategory = asyncHandler(async (req, res, next) => {
 
   // const data = await Category.create(req.body);
   const { title } = req.body;
-  const data = await Category.findOneAndUpdate({ title }, req.body, {
-    new: true,
-    runValidators: true,
-    upsert: true,
-  });
+  const data = await Category.findOneAndUpdate({ title }, req.body, upsertOptions);
   if (!data) return next(new ErrorResponse(`Category not found!`, 404));
 
   await audit.create(req.user, "Category");
@@ -68,10 +79,7 @@ exports.updateCategory = asyncHandler(async (req, res, next) => {
   if (req.files)
     req.body.image = (await uploadBlob(req, req.files, "images", "blog"))[0];
 
-  const data = await Category.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  }).populate(this.populateCategory);
+  const data = await Category.findByIdAndUpdate(id, req.body, updateOptions).populate(this.populateCategory);
   if (!data) return next(new ErrorResponse(`Category not found!`, 404));
 
   await audit.update(req.user, "Category", data?._id);

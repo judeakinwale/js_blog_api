@@ -3,6 +3,7 @@ const asyncHandler = require("../middleware/async");
 const Comment = require("../models/Comment");
 const { updateMetaData, sortArrayOfObjects } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 const Post = require("../models/Post");
 
 exports.populateComment = [
@@ -92,10 +93,7 @@ exports.updateComment = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   if (!id) return next(new ErrorResponse(`Comment Id not provided`, 400));
 
-  const data = await Comment.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  }).populate(this.populateComment);
+  const data = await Comment.findByIdAndUpdate(id, req.body, updateOptions).populate(this.populateComment);
   if (!data) return next(new ErrorResponse(`Comment not found!`, 404));
 
   await audit.update(req.user, "Comment", data?._id);

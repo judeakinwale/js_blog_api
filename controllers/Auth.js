@@ -10,6 +10,7 @@ const sendEmail = require("../utils/sendEmail");
 // const { updateMetaData } = require("../utils/utils");
 // const Tenant = require("../models/Tenant");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 
 
 // @desc    Get Single User By Email
@@ -34,10 +35,7 @@ exports.updateUserByEmail = asyncHandler(async (req, res, next) => {
   const email = req.params.email?.toLowerCase();
   if (!email) return next(new ErrorResponse(`User Id not provided`, 400));
 
-  const data = await User.findOneAndUpdate({ email }, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const data = await User.findOneAndUpdate({ email }, req.body, updateOptions);
   await audit.update(req.user, "User", data?._id);
   res.status(200).json({
     success: true,

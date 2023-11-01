@@ -18,6 +18,7 @@ const {
 const Tenant = require("../models/Tenant");
 const { getTenantByEmail } = require("../utils/tenantUtils");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 
 // TODO: refactor file
 

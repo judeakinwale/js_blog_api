@@ -81,11 +81,7 @@ exports.createOrUpdateUserQuiz = async (payload) => {
   // delete _id from the payload (if in payload)
   delete payload._id
 
-  const data = await UserQuiz.findOneAndUpdate({ quiz, user }, payload, {
-    new: true,
-    runValidators: true,
-    upsert: true,
-  });
+  const data = await UserQuiz.findOneAndUpdate({ quiz, user }, payload, upsertOptions);
   if (!data) throw new ErrorResponse(`UserQuiz not found!`, 404);
 
   return data;

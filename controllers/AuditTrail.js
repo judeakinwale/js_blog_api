@@ -5,6 +5,7 @@ const {
   updateMetaData,
 } = require("../utils/utils");
 const { audit } = require("../utils/auditUtils");
+const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 
 // @desc    Create AuditTrail/
 // @route   POST  /api/v1/audit/
@@ -54,10 +55,7 @@ exports.updateAuditTrail = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   if (!id) return next(new ErrorResponse(`AuditTrail Id not provided`, 400));
 
-  const data = await AuditTrail.findByIdAndUpdate(id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  const data = await AuditTrail.findByIdAndUpdate(id, req.body, updateOptions);
   if (!data) return next(new ErrorResponse(`AuditTrail not found!`, 404));
 
   await audit.update(req.user, "AuditTrail", data?._id);
