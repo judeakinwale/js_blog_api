@@ -36,29 +36,33 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     runValidators: true,
     upsert: true,
   });
-  if (!data) return next(new ErrorResponse(`Post not found!`, 404));
+  if (!data) return next(new ErrorResponse(`Post not created!`, 404));
 
   // update posts in categories and validate categories in related post
   // TODO: update this
   if (data.categories.length > 0) {
     await Promise.all(
       data.categories.map(async (cat) => {
-        const updatedCat = await Category.findByIdAndUpdate(cat, {
-          $addToSet: { posts: data._id },
-        });
-        if (!updatedCat) {
-          await Post.findByIdAndUpdate(
-            data._id,
-            {
-              $pull: { categories: cat },
-            },
-            {
-              new: true,
-              runValidators: true,
-            }
-          );
-          // return next(new ErrorResponse(`Related Post not found!`, 404));
-          console.log("Removed non existent category from post");
+        try {
+          const updatedCat = await Category.findByIdAndUpdate(cat, {
+            $addToSet: { posts: data._id },
+          });
+          if (!updatedCat) {
+            await Post.findByIdAndUpdate(
+              data._id,
+              {
+                $pull: { categories: cat },
+              },
+              {
+                new: true,
+                runValidators: true,
+              }
+            );
+            // return next(new ErrorResponse(`Related Post not found!`, 404));
+            console.log("Removed non existent category from post");
+          }
+        } catch (error) {
+          console.log("Updating category or removing invalid category failed");
         }
       })
     );

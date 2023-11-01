@@ -45,7 +45,7 @@ const Comment = new mongoose.Schema({
   },
   updatedAt: {
     type: Date,
-    default: this.createdAt ? new Date() : undefined,
+    default: Date.now(),
   },
 });
 
