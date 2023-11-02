@@ -7,6 +7,7 @@ const { audit } = require("../utils/auditUtils");
 const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 const Category = require("../models/Category");
 const { uploadBlob } = require("../utils/fileUtils");
+const { isValidObjectId } = require("mongoose");
 
 exports.populatePost = [
   {
@@ -26,17 +27,41 @@ exports.populatePost = [
 // @access   Public
 exports.createPost = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
-  const message = []
+  const message = [];
 
-  if (req.files) 
+  if (req.files)
     req.body.images = await uploadBlob(req, req.files, "images", "blog");
+
+  // handle for formdata and application/json
+  const categories = req.body.categories || req.body["category[]"];
+
+  // validate category in categories is a valid objectId
+  const categoriesWithValidObjectId = [];
+  if (categories?.length > 0) {
+    for (let i = 0; i < categories.length; i++) {
+      console.log({ i });
+      if (!isValidObjectId(categories[i])) {
+        message.push("Invalid ObjectId provided as category Id at index: " + i);
+        continue;
+      }
+      categoriesWithValidObjectId.push(categories[i]);
+    }
+  }
+
+  // set req.body.categories to valid categories
+  req.body.categories = categoriesWithValidObjectId;
+  console.log({ categories: req.body.categories });
 
   // const data = await Post.create(req.body);
   const { title, author } = req.body;
-  const data = await Post.findOneAndUpdate({ title, author }, req.body, upsertOptions);
+  let data = await Post.findOneAndUpdate(
+    { title, author },
+    req.body,
+    upsertOptions
+  );
   if (!data) return next(new ErrorResponse(`Post not found!`, 404));
 
-  // update posts in categories and validate categories in related post
+  // update posts in categories (date.categories) and validate categories in post
   // TODO: update this
   if (data.categories.length > 0) {
     await Promise.all(
@@ -46,7 +71,7 @@ exports.createPost = asyncHandler(async (req, res, next) => {
             $addToSet: { posts: data._id },
           });
           if (!updatedCat) {
-            await Post.findByIdAndUpdate(
+            data = await Post.findByIdAndUpdate(
               data._id,
               {
                 $pull: { categories: cat },
@@ -111,7 +136,11 @@ exports.updatePost = asyncHandler(async (req, res, next) => {
   if (req.files)
     req.body.images = await uploadBlob(req, req.files, "images", "blog");
 
-  const data = await Post.findByIdAndUpdate(id, req.body, updateOptions).populate(this.populatePost);
+  const data = await Post.findByIdAndUpdate(
+    id,
+    req.body,
+    updateOptions
+  ).populate(this.populatePost);
   if (!data) return next(new ErrorResponse(`Post not found!`, 404));
 
   await audit.update(req.user, "Post", data?._id);
