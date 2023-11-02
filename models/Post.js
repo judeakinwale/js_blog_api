@@ -9,9 +9,13 @@ const Post = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // author: {  // storing author as a user id
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  //   required: true,
+  // },
   author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
     required: true,
   },
   categories: [
@@ -49,5 +53,11 @@ const Post = new mongoose.Schema({
 });
 
 Post.index({ title: "text", description: "text" });
+
+// storing author as a user id
+// Post.path("author").validate(async (value) => {
+//   // return await mongoose.model("User").findById(value);
+//   return await mongoose.model("User").exists({_id: value});
+// }, "Author does not exist");
 
 module.exports = mongoose.model("Post", Post);
