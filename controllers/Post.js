@@ -62,7 +62,6 @@ exports.createPost = asyncHandler(async (req, res, next) => {
   if (!data) return next(new ErrorResponse(`Post not found!`, 404));
 
   // update posts in categories (date.categories) and validate categories in post
-  // TODO: update this
   if (data.categories.length > 0) {
     await Promise.all(
       data.categories.map(async (cat) => {
