@@ -5,6 +5,11 @@ const Post = new mongoose.Schema({
     type: String,
     required: true,
   },
+  type: {
+    type: String,
+    enum: ["featured", "headline", "alert", "post"],
+    default: "post",
+  },
   content: {
     type: String,
     required: true,
