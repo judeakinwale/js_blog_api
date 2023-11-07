@@ -20,6 +20,9 @@ exports.populatePost = [
       },
     },
   },
+  {
+    path: "categories"
+  }
 ];
 
 // @desc    Create Post/
