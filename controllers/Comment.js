@@ -26,9 +26,9 @@ exports.createComment = asyncHandler(async (req, res, next) => {
   updateMetaData(req.body, req.user?._id);
 
   // const data = await Comment.create(req.body);
-  const { post, author, parent } = req.body;
+  const { post, email, parent } = req.body;
   const data = await Comment.findOneAndUpdate(
-    { post, author, parent },
+    { post, email, parent },
     req.body,
     {
       new: true,
