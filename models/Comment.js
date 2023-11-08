@@ -13,10 +13,18 @@ const Comment = new mongoose.Schema({
     type: String,
     required: true,
   },
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+  // author: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "User",
+  //   required: true,
+  // },
+  name: {
+    type: String,
+    // required: true,
+  },
+  email: {
+    type: String,
+    // required: true,
   },
   parent: {
     type: mongoose.Schema.Types.ObjectId,
@@ -40,8 +48,8 @@ const Comment = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    // default: Date.now,
-    default: new Date(),
+    default: Date.now,
+    // default: new Date(),
   },
   updatedAt: {
     type: Date,
@@ -49,6 +57,7 @@ const Comment = new mongoose.Schema({
   },
 });
 
-Comment.index({ post: "text", author: "text" });
+// Comment.index({ post: "text", author: "text" });
+Comment.index({ post: "text", name: "text", email: "text" });
 
 module.exports = mongoose.model("Comment", Comment);

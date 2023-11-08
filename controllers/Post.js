@@ -36,6 +36,9 @@ exports.createPost = asyncHandler(async (req, res, next) => {
     req.body.images = await uploadBlob(req, req.files, "images", "blog");
 
   // handle for formdata and application/json
+  if (typeof req.body["categories[]"] == "string") {
+    req.body["categories[]"] = [req.body["categories[]"]];  // string to string[]
+  }
   const categories = req.body.categories || req.body["categories[]"];
 
   // validate category in categories is a valid objectId
