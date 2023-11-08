@@ -41,7 +41,7 @@ exports.createComment = asyncHandler(async (req, res, next) => {
   // update parent comment
   if (data.parent) {
     const parentComment = await Comment.findByIdAndUpdate(data.parent, {
-      $push: { children: data },
+      $addToSet: { children: data },
     });
     if (!parentComment)
       return next(new ErrorResponse(`Parent Comment not found!`, 404));
@@ -50,7 +50,7 @@ exports.createComment = asyncHandler(async (req, res, next) => {
   // update comments in related post
   if (data.post) {
     const relatedPost = await Post.findByIdAndUpdate(data.post, {
-      $push: { comments: data },
+      $addToSet: { comments: data },
     });
     if (!relatedPost)
       return next(new ErrorResponse(`Related Post not found!`, 404));
