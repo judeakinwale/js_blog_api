@@ -2,118 +2,122 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const { timestampOptions } = require("../utils/mongooseUtils");
 
-const UserSchema = new mongoose.Schema({
-  //pelumi
-  // companyId: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "Company",
-  // },
-  isSubscribed: {
-    type: Boolean,
-    default: false,
-  },
-  //pelumi
+const UserSchema = new mongoose.Schema(
+  {
+    //pelumi
+    // companyId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Company",
+    // },
+    isSubscribed: {
+      type: Boolean,
+      default: false,
+    },
+    //pelumi
 
-  tenant: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Tenant",
-  },
-  fullname: {
-    type: String,
-  },
-  firstname: {
-    type: String,
-    required: [true, "Please add Firstname"],
-  },
-  middlename: {
-    type: String,
-  },
-  lastname: {
-    type: String,
-    required: [true, "Please add Lastname"],
-  },
-  email: {
-    type: String,
-    lowercase: true,
-    unique: true,
-  },
-  dob: { type: String },
-  phone: {
-    type: String,
-    // unique: true,
-  },
-  department: {
-    type: String,
-  },
-  gender: {
-    type: String,
-  },
-  address: {
-    type: String,
-  },
-  role: {
-    type: String,
-    enum: ["User", "Admin", "SuperAdmin", "Instructor"],
-    default: "User",
-  },
+    tenant: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tenant",
+    },
+    fullname: {
+      type: String,
+    },
+    firstname: {
+      type: String,
+      required: [true, "Please add Firstname"],
+    },
+    middlename: {
+      type: String,
+    },
+    lastname: {
+      type: String,
+      required: [true, "Please add Lastname"],
+    },
+    email: {
+      type: String,
+      lowercase: true,
+      unique: true,
+    },
+    dob: { type: String },
+    phone: {
+      type: String,
+      // unique: true,
+    },
+    department: {
+      type: String,
+    },
+    gender: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    role: {
+      type: String,
+      enum: ["User", "Admin", "SuperAdmin", "Instructor"],
+      default: "User",
+    },
 
-  password: {
-    type: String,
-    required: [true, "Please add a password"],
-    // minlength: 6,
-    select: false,
-  },
+    password: {
+      type: String,
+      required: [true, "Please add a password"],
+      // minlength: 6,
+      select: false,
+    },
 
-  // subscription: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "Subscription",
-  // },
-  points: {
-    type: Number,
-    default: 0,
-  },
-  isTrial: {
-    type: Boolean,
-    default: true,
-  },
-  trialExpiry: {
-    type: Date,
-  },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-  activationToken: String,
-  activationExpire: Date,
+    // subscription: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Subscription",
+    // },
+    points: {
+      type: Number,
+      default: 0,
+    },
+    isTrial: {
+      type: Boolean,
+      default: true,
+    },
+    trialExpiry: {
+      type: Date,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    activationToken: String,
+    activationExpire: Date,
 
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  photo: {
-    type: String,
-  },
-  state: {
-    type: String,
-  },
-  lga: {
-    type: String,
-  },
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+    photo: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    lga: {
+      type: String,
+    },
 
-  loginAttempts: [{ type: String }],
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    loginAttempts: [{ type: String }],
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    // createdAt: {
+    //   type: Date,
+    //   default: () => new Date.now(),
+    //   // default: new Date(),
+    // },
+    // updatedAt: {
+    //   type: Date,
+    //   default: Date.now,
+    // },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-    // default: new Date(),
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  timestampOptions
+);
 //Encrypt password using bcrypt
 UserSchema.pre("save", async function (next) {
   this.fullname = `${this.firstname} ${this.lastname}`;

@@ -1,33 +1,37 @@
 const mongoose = require("mongoose");
+const { timestampOptions } = require("../utils/mongooseUtils");
 
-const Category = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true,
-  },
-  image: {
-    type: String,
-  }, // Store image URLs as strings
-  posts: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
+const Category = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-  ],
-  createdBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    image: {
+      type: String,
+    }, // Store image URLs as strings
+    posts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post",
+      },
+    ],
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    // createdAt: {
+    //   type: Date,
+    //   default: () => new Date.now(),
+    //   // default: new Date(),
+    // },
+    // updatedAt: {
+    //   type: Date,
+    //   default: Date.now,
+    // },
   },
-  createdAt: {
-    type: Date,
-    default: Date.now(),
-    // default: new Date(),
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  timestampOptions
+);
 
 Category.index({ title: "text", description: "text" });
 
