@@ -45,8 +45,8 @@ app.use(fileupload());
 app.use(mongoSanitize());
 
 //set security headers
-app.use(helmet());
-// app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));  // ! for scp headers error in frontend build
+// app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));  // ! for scp headers error in frontend build
 
 // Prevent XSS attacks
 app.use(xss());

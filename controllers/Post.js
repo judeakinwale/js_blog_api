@@ -8,6 +8,9 @@ const { upsertOptions, updateOptions } = require("../utils/mongooseUtils");
 const Category = require("../models/Category");
 const { uploadBlob } = require("../utils/fileUtils");
 const { isValidObjectId } = require("mongoose");
+const Comment = require("../models/Comment");
+const AuditTrail = require("../models/AuditTrail");
+const User = require("../models/User");
 
 exports.populatePost = [
   {
@@ -110,6 +113,13 @@ exports.createPost = asyncHandler(async (req, res, next) => {
 // @route   POST  /api/v1/post/
 // @access   Private/Admin
 exports.getPosts = asyncHandler(async (req, res, next) => {
+  const allPosts = await User.find()
+  await Promise.all(allPosts.map(async p => {
+    console.log({p: p._id})
+    p.createdAt = p.createdAt || new Date();
+    p.updatedAt = p.updatedAt || new Date();
+    await p.save()
+  }))
   res.status(200).json(res.advancedResults);
 });
 
