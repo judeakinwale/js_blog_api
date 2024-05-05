@@ -7,9 +7,9 @@ const { token, rand } = require("./utils");
 // const router = require("express").Router();
 
 dotenv.config({ path: "./config/.env" });
-const multer = require("multer");
-const inMemoryStorage = multer.memoryStorage();
-const uploadStrategy = multer({ storage: inMemoryStorage }).single("image");
+// const multer = require("multer");
+// const inMemoryStorage = multer.memoryStorage();
+// const uploadStrategy = multer({ storage: inMemoryStorage }).single("image");
 const { BlockBlobClient, BlobServiceClient } = require("@azure/storage-blob");
 const getStream = require("into-stream");
 
@@ -195,7 +195,7 @@ exports.getFileExtensions = async (req, files = undefined) => {
 //   /**
 //    * @summary
 //    *  upload a blob and return the blob url
-//    *
+//    *w
 //    * @param req - request object
 //    * @param files - req.files or a similarly structured queryset parent directory
 //    *
