@@ -28,9 +28,9 @@ const handleError = (err, res) => {
   res.render("error", { error: err });
 };
 
-exports.multerUploadConfig = multer({ storage: inMemoryStorage }).fields([
-  { name: "files", maxCount: 3 },
-]);
+// exports.multerUploadConfig = multer({ storage: inMemoryStorage }).fields([
+//   { name: "files", maxCount: 3 },
+// ]);
 
 exports.sizeBelowLimit = (size, limit = fileSizeLimit) => {
   if (size > limit) throw new SyntaxError("Size is Above the Limit");
